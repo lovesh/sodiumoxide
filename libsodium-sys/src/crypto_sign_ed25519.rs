@@ -37,6 +37,9 @@ extern {
         m: *const u8,
         mlen: c_ulonglong,
         pk: *const [u8; crypto_sign_ed25519_PUBLICKEYBYTES]) -> c_int;
+    pub fn crypto_sign_ed25519_sk_to_seed(
+        seed: *mut [u8; crypto_sign_ed25519_SEEDBYTES],
+        sk: *const [u8; crypto_sign_ed25519_SECRETKEYBYTES]) -> c_int;
     pub fn crypto_sign_ed25519_bytes() -> size_t;
     pub fn crypto_sign_ed25519_seedbytes() -> size_t;
     pub fn crypto_sign_ed25519_publickeybytes() -> size_t;

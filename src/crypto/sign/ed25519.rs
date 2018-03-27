@@ -144,6 +144,14 @@ pub fn verify_detached(&Signature(ref sig): &Signature,
     }
 }
 
+pub fn seed_from_secret_key(&SecretKey(ref sk): &SecretKey) -> Seed {
+    unsafe {
+        let mut seed = [0u8; SEEDBYTES];
+        ffi::crypto_sign_ed25519_sk_to_seed(&mut seed, sk);
+        Seed(seed)
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -231,6 +239,19 @@ mod test {
                 assert!(Err(()) == verify(&mut sm, &pk));
                 sm[j] ^= 0x20;
             }
+        }
+    }
+
+    #[test]
+    fn test_recreate_seed() {
+        use randombytes::randombytes_into;
+        for _ in 0..32usize {
+            let mut seedbuf = [0; 32];
+            randombytes_into(&mut seedbuf);
+            let seed = Seed(seedbuf);
+            let (_, sk) = keypair_from_seed(&seed);
+            let recreated_seed = seed_from_secret_key(&sk);
+            assert_eq!(recreated_seed, seed);
         }
     }
 
